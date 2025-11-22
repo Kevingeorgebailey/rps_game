@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rock Paper Scissors</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #4f46e5 0, #111827 45%, #020617 100%);
+      color: #e5e7eb;
+    }
+
+    .game-card {
+      background: rgba(15, 23, 42, 0.95);
+      padding: 2rem 2.5rem;
+      border-radius: 1.5rem;
+      box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(148, 163, 184, 0.2);
+      width: min(420px, 90vw);
+      text-align: center;
+      backdrop-filter: blur(12px);
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-bottom: 1.5rem;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    button.choice-btn {
+      flex: 1;
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, #1f2937, #374151);
+      color: #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      transition:
+        transform 0.12s ease-out,
+        box-shadow 0.12s ease-out,
+        background 0.2s ease-out;
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
+    }
+
+    button.choice-btn span.emoji {
+      font-size: 1.5rem;
+    }
+
+    button.choice-btn span.label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #9ca3af;
+    }
+
+    button.choice-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.9);
+      background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+    }
+
+    button.choice-btn:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 3px 8px rgba(15, 23, 42, 0.9);
+    }
+
+    .status {
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+      color: #cbd5f5;
+      min-height: 1.2em;
+    }
+
+    .result {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      min-height: 1.4em;
+    }
+
+    .result.win {
+      color: #22c55e;
+    }
+
+    .result.lose {
+      color: #f97373;
+    }
+
+    .result.draw {
+      color: #eab308;
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(55, 65, 81, 0.9);
+      color: #9ca3af;
+    }
+
+    .scoreboard span strong {
+      color: #e5e7eb;
+    }
+
+    .footer-note {
+      margin-top: 0.75rem;
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="game-card">
+    <h1>Rock ✊ Paper ✋ Scissors ✌</h1>
+    <p class="subtitle">Choose your move and see if you can beat the computer.</p>
+
+    <div class="buttons">
+      <button class="choice-btn" data-choice="0">
+        <span class="emoji">✊</span>
+        <span class="label">Rock</span>
+      </button>
+      <button class="choice-btn" data-choice="1">
+        <span class="emoji">✋</span>
+        <span class="label">Paper</span>
+      </button>
+      <button class="choice-btn" data-choice="2">
+        <span class="emoji">✌</span>
+        <span class="label">Scissors</span>
+      </button>
+    </div>
+
+    <div id="status" class="status"></div>
+    <div id="result" class="result"></div>
+
+    <div class="scoreboard">
+      <span>You: <strong id="player-score">0</strong></span>
+      <span>Computer: <strong id="computer-score">0</strong></span>
+    </div>
+
+    <p class="footer-note">Refresh the page to reset the scores.</p>
+  </div>
+
+  <script>
+    const choices = ["Rock ✊", "Paper ✋", "Scissors ✌"];
+
+    function getResult(user, computer) {
+      if (user === computer) return "draw";
+      if (
+        (user === 0 && computer === 2) ||
+        (user === 1 && computer === 0) ||
+        (user === 2 && computer === 1)
+      ) {
+        return "win";
+      }
+      return "lose";
+    }
+
+    const statusDiv = document.getElementById("status");
+    const resultDiv = document.getElementById("result");
+    const playerScoreSpan = document.getElementById("player-score");
+    const computerScoreSpan = document.getElementById("computer-score");
+
+    let playerScore = 0;
+    let computerScore = 0;
+
+    document.querySelectorAll(".choice-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const userChoice = parseInt(btn.dataset.choice, 10);
+        const computerChoice = Math.floor(Math.random() * 3);
+
+        statusDiv.textContent =
+          `You chose ${choices[userChoice]} • Computer chose ${choices[computerChoice]}`;
+
+        const outcome = getResult(userChoice, computerChoice);
+
+        resultDiv.classList.remove("win", "lose", "draw");
+        if (outcome === "win") {
+          resultDiv.textContent = "You win! 🎉";
+          resultDiv.classList.add("win");
+          playerScore++;
+        } else if (outcome === "lose") {
+          resultDiv.textContent = "You lose! 💻 wins this round.";
+          resultDiv.classList.add("lose");
+          computerScore++;
+        } else {
+          resultDiv.textContent = "It's a draw. 🤝";
+          resultDiv.classList.add("draw");
+        }
+
+        playerScoreSpan.textContent = playerScore;
+        computerScoreSpan.textContent = computerScore;
+      });
+    });
+  </script>
+</body>
+</html>
